@@ -104,7 +104,7 @@ materialMShape = fn_coord[1] <= deform_fn
 
 materialA = Model.add_material(name="Air", shape=materialAShape)
 materialM = Model.add_material(name="Mantle", shape=materialMShape)
-sediment = Model.add_material(name="sediment", shape=materialMShape)
+sediment = Model.add_material(name="sediment")
 
 npoints = xRes*2+1
 coords = np.zeros((npoints,2))
