@@ -13,7 +13,7 @@
   <!-- Sea-level structure -->
   <sea>
     <!-- Relative sea-level position [m] -->
-    <position>0.</position>
+    <position>-200.</position>
     <!-- Sea-level curve - (optional) -->
     <!-- <curve>data/sea.csv</curve> -->
     <!-- Limit flow network computation based on
@@ -25,60 +25,34 @@
     <!-- Simulation start time [a] -->
     <start>0.</start>
     <!-- Simulation end time [a] -->
-    <end>401000000.</end>
+    <end>612000.</end>
     <!-- Display interval [a] -->
     <!-- This will be overridden by the linkage, so it doesn't matter -->
-    <display>1000000.</display>
+    <display>1200.</display>
   </time>
+  <strata>
+    <stratdx>2000.</stratdx>
+    <laytime>1200.</laytime>
+  </strata>
   <!-- Precipitation structure -->
   <precipitation>
     <!-- Number of precipitation events -->
-    <climates>2</climates>
+    <climates>1</climates>
     <!-- Precipitation definition -->
     <rain>
       <!-- Rain start time [a] -->
       <rstart>0.</rstart>
       <!-- Rain end time [a] -->
-      <rend>1000000.</rend>
+      <rend>612000.</rend>
       <!-- Precipitation value [m/a] - (optional) -->
       <rval>1.</rval>
     </rain>
-    <!-- Orographic precipitation model definition -->
-    <rain>
-      <!-- Rain start time [a] -->
-      <rstart>1000000.</rstart>
-      <!-- Rain end time [a] -->
-      <rend>5000000.</rend>
-      <!-- Rain computation time step [a] -->
-      <ortime>10000.</ortime>
-      <!-- Background precipitation value [m/a] -->
-      <rbgd>1.</rbgd>
-      <!-- Minimal precipitation value [m/a] -->
-      <rmin>0.1</rmin>
-      <!-- Maximal precipitation value [m/a] -->
-      <rmax>2.</rmax>
-      <!-- Wind velocity along X (W-E) direction [m/s] -->
-      <windx>2.</windx>
-      <!-- Wind velocity along Y (S-N) direction [m/s] -->
-      <windy>0.</windy>
-      <!-- Time conversion from cloud water to hydrometeors
-                 range from 200 to 2000 [s]. Optional default is set
-                 to 1000 s -->
-      <tauc>300.</tauc>
-      <!-- Time for hydrometeor fallout range from 200 to 2000 [s].
-                 Optional default is set to 1000 s -->
-      <tauf>750.</tauf>
-      <!-- Moist stability frequency range from 0 to 0.01 [/s].
-                 Optional default is set to 0.005 /s -->
-      <nm>0.005</nm>
-      <!-- Uplift sensitivity factor range from 0.001 to 0.02 [kg/m3].
-                 Optional default is set to 0.005 kg/m3 -->
-      <cw>0.005</cw>
-      <!-- Depth of the moist layer range from 1000 to 5000 [m].
-                 Optional default is set to 3000 m -->
-      <hw>2000.</hw>
-    </rain>
-  </precipitation> 
+  </precipitation>
+  <!-- Stream power law parameters:
+         The stream power law is a simplified form of the usual expression of
+         sediment transport by water flow, in which the transport rate is assumed
+         to be equal to the local carrying capacity, which is itself a function of
+         boundary shear stress. -->
   <sp_law>
     <!-- Values of m and n indicate how the incision rate scales
              with bed shear stress for constant value of sediment flux
@@ -90,20 +64,19 @@
     <!-- The erodibility coefficient is scale-dependent and its value depend
               on lithology and mean precipitation rate, channel width, flood
               frequency, channel hydraulics. -->
-    <erodibility>1.e-3</erodibility>
+    <erodibility>1.e-6</erodibility>
+    <diffnb>10</diffnb>
+    <diffprop>0.05</diffprop>
   </sp_law>
   <!-- Linear slope diffusion parameters:
          Parameterisation of the sediment transport includes the simple creep transport
          law which states that transport rate depends linearly on topographic gradient. -->
-  <strata>
-    <stratdx>5000.</stratdx>
-    <!-- <laytime>100000.</laytime> -->
-  </strata>
   <creep>
     <!-- Surface diffusion coefficient [m2/a] -->
     <caerial>0.5</caerial>
     <!-- Marine diffusion coefficient [m2/a] -->
-    <cmarine>0.5</cmarine>
+    <cmarine>1.0</cmarine>
+    <criver>10</criver>
   </creep>
   <!-- Output folder path -->
   <outfolder>outbdls</outfolder>
