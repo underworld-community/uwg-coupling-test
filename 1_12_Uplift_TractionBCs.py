@@ -1,22 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# In[1]:
-
-
+# %%
 from underworld import UWGeodynamics as GEO
 from underworld import visualisation as vis
 
 
-# In[2]:
-
-
+# %%
 u = GEO.UnitRegistry
 
 
-# In[3]:
-
-
+# %%
 # build reference units
 KL_meters   = 100e3 * u.meter
 K_viscosity = 1e16 * u.pascal * u.second
@@ -35,9 +28,7 @@ GEO.scaling_coefficients["[time]"] = KT_seconds.to_base_units()
 GEO.scaling_coefficients["[mass]"] = KM_kilograms.to_base_units()
 
 
-# In[4]:
-
-
+# %%
 Model = GEO.Model(
     elementRes=(100, 60),
     minCoord=(0 * u.km, 0 * u.km),
@@ -45,28 +36,20 @@ Model = GEO.Model(
 )
 
 
-# In[5]:
-
-
+# %%
 Model.outputDir = "1_12_Uplift_TractionBCs"
 
 
-# In[6]:
-
-
+# %%
 layer_h = 0.6 * Model.maxCoord[1]
 
 
-# In[7]:
-
-
+# %%
 # lithostaticPressure = GEO.nd(-Model.gravity[1] * K_density * layer_h)
 lithostaticPressure = -Model.gravity[1] * K_density * layer_h
 
 
-# In[8]:
-
-
+# %%
 air = Model.add_material(
     name="air", shape=GEO.shapes.Layer2D(top=Model.top, bottom=0.0)
 )
@@ -75,9 +58,7 @@ background = Model.add_material(
 )
 
 
-# In[9]:
-
-
+# %%
 # if GEO.size == 1:
 #     Fig = vis.Figure(figsize=(1200,400))
 #     Fig.Points(Model.swarm, Model.materialField, fn_size=2.0)
@@ -85,9 +66,7 @@ background = Model.add_material(
 #     Fig.show()
 
 
-# In[10]:
-
-
+# %%
 air.density        = 0.0 * u.kilogram / u.metre**3
 background.density = 3300.0 * u.kilogram / u.metre**3
 
@@ -98,9 +77,7 @@ air.compressibility        = 1.0 / (1e11 * u.Pa * u.sec)
 background.compressibility = 0.0
 
 
-# In[11]:
-
-
+# %%
 # if GEO.size == 1:
 #     Fig = vis.Figure(figsize=(1200,400))
 #     Fig.Points(Model.swarm, Model.materialField, fn_size=2)
@@ -109,9 +86,7 @@ background.compressibility = 0.0
 #     Fig.show()
 
 
-# In[12]:
-
-
+# %%
 # traction perturbation parameters
 import numpy as np
 
@@ -126,9 +101,7 @@ for ii in Model.bottom_wall:
     ]  # important to non dimensionalise this
 
 
-# In[13]:
-
-
+# %%
 # # visualise the bottom stress condition
 # if GEO.size == 1:
 #     GEO.uw.utils.matplotlib_inline()
@@ -149,22 +122,16 @@ for ii in Model.bottom_wall:
 #     pyplot.show()
 
 
-# In[14]:
-
-
+# %%
 Model.set_velocityBCs(left=[0.0, None], right=[0.0, None], top=[None, 0.0])
 Model.set_stressBCs(bottom=[0.0, Model.tractionField[1]])
 
 
-# In[15]:
-
-
+# %%
 Model.run_for(nstep=10)
 
 
-# In[16]:
-
-
+# %%
 # if GEO.size==1:
 #     Fig = vis.Figure(figsize=(1200,400))
 #     Fig.Points(Model.swarm, Model.materialField, fn_size=2.0)
@@ -173,12 +140,8 @@ Model.run_for(nstep=10)
 #     Fig.show()
 
 
-# In[17]:
-
-
+# %%
 # TODO, better test for model
 if not np.isclose(Model.stokes_SLE.velocity_rms(), 1.3497493646857656e-18):
     raise RuntimeError("Velocity is not as expected")
 
-
-# In[ ]:
