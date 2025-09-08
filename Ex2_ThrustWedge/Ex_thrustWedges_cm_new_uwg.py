@@ -9,8 +9,6 @@ from underworld import UWGeodynamics as GEO
 import numpy as np
 from underworld import visualisation as vis
 
-from surfaceProcesses_fix import *
-
 GEO.rcParams["initial.nonlinear.tolerance"] = 1e-3
 GEO.rcParams['initial.nonlinear.max.iterations'] = 100
 GEO.rcParams["nonlinear.tolerance"] = 1e-3
@@ -53,7 +51,7 @@ Model = GEO.Model(elementRes=(xRes, yRes),
                   maxCoord=(xmax, ymax),
                   gravity=(0.0, -9.81 * u.meter / u.second**2))
 
-outputPath = "op_Wedge_FreeSurfEulerian_yres{:n}_uwg_cmfix".format(yRes)
+outputPath = "op_Wedge_FreeSurfEulerian_yres{:n}_uwg_cm_new".format(yRes)
 Model.outputDir = outputPath
 
 air_shape = GEO.shapes.Layer(top=Model.top, bottom=0.)
@@ -81,7 +79,6 @@ for index in range(NLayers):
     plastic_pile.append(material)
     layer_above = shape
 
-
 Model.density = 2700 * u.kilogram / u.metre**3
 Model.viscosity = 1e23 * u.pascal * u.second
 Model.maxViscosity = 1e23 * u.pascal * u.second
@@ -97,6 +94,7 @@ for material in plastic_pile:
     material.density = 2700 * u.kilogram / u.metre**3
     material.viscosity = 1e23 * u.pascal * u.second
 
+
 frictionalBasal.viscosity = 1e23 * u.pascal * u.second
 rigidBase.viscosity = 1e23 * u.pascal * u.second
 
@@ -111,7 +109,6 @@ plastic_Law = GEO.DruckerPrager(
 
 for material in plastic_pile:
     material.plasticity = plastic_Law
-
 
 sediment.density = 2700 * u.kilogram / u.metre**3
 sediment.viscosity = 1e23 * u.pascal * u.second
@@ -141,6 +138,7 @@ Model.set_velocityBCs(left=[fn_condition, 0.],
                       right=[-velocity, None],
                       top=[None, None],
                       bottom=[-velocity, 0.])
+
  
 Model.solver.set_inner_method("mumps")
 #Model.solver.set_penalty(1e6)
@@ -151,8 +149,6 @@ dt_set =  5.0*u.kiloyear
 max_time = 1e3*u.kiloyear
 checkpoint_interval = 1e2*u.kiloyear
 
-Model.surfaceProcesses = Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set,aspectRatio2d=0.25,surfElevation=0.)
+Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set,aspectRatio2d=0.25,surfElevation=0.)
 
 Model.run_for(max_time, checkpoint_interval=checkpoint_interval,dt=dt_set)
-
-

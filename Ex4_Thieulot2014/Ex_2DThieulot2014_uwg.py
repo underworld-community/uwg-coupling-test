@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#!/usr/bin/env python
-# coding: utf-8
-
 # Thieulot20142D_Convergence
 # ======
 # 
@@ -15,11 +12,9 @@
 # 1. Thieulot, C., Steer, P., & Huismans, R. S. (2014). Three‐dimensional numerical simulations of crustal systems undergoing orogeny and subjected to surface processes. Geochemistry, Geophysics, Geosystems, 15(12), 4936-4957.
 # ![](./images/Thieulot2014.png)
 
-
 # need to check 
 # - update plastic strain with boundary
 # - nonLinearSolver(step, nl_tol=1e-2, nl_maxIts=40) for Pressure Calibration
-
 
 import underworld as uw
 import math
@@ -36,10 +31,6 @@ comm = uw.mpi.comm
 rank = uw.mpi.rank
 size = uw.mpi.size
 
-# In[5]:
-
-
-# solver parameters
 GEO.rcParams["initial.nonlinear.tolerance"] = 1e-3
 GEO.rcParams['initial.nonlinear.max.iterations'] = 100
 GEO.rcParams["nonlinear.tolerance"] = 1e-3
@@ -50,11 +41,6 @@ GEO.rcParams["surface.pressure.normalization"] = True
 GEO.rcParams["pressure.smoothing"] = True
 GEO.rcParams["popcontrol.split.threshold"] = 0.15
 
-
-# In[6]:
-
-
-# scaling 3: vel
 half_rate = (0.5 * u.centimeter / u.year).to(u.meter / u.second)
 model_length = 192e3 * u.meter
 model_width = 64e3 * u.meter
@@ -76,17 +62,14 @@ GEO.scaling_coefficients["[mass]"]= KM_kilograms
 GEO.scaling_coefficients["[temperature]"] = Kt_degrees
 GEO.scaling_coefficients["[substance]"] = K_substance
 
-
 gravity = ndim (9.81 * u.meter / u.second**2)
 R = ndim (8.3144621 * u.joule / u.mole / u.degK)
-
 
 # xRes, yRes,zRes = 95,43,13  # paper for 192km, 64km, 28km
 # xRes, yRes,zRes = 96,32,18  # hpc
 xRes, yRes,zRes= 48,16,10 # local
 
 xmin, xmax = ndim(0. * u.kilometer), ndim(192. * u.kilometer)
-#ymin, ymax = ndim(0. * u.kilometer), ndim(64. * u.kilometer)
 zmin, zmax = ndim(-28 * u.kilometer), ndim(12 * u.kilometer)
 zint = 0.
 
@@ -112,27 +95,7 @@ coords[:, 0] = np.linspace(GEO.nd(Model.minCoord[0]), GEO.nd(Model.maxCoord[0]),
 coords[:, 1] = GEO.nd(uppercrust.top)
 surf_tracers = Model.add_passive_tracers(name="Surface", vertices=coords)
 
-# if size == 1:
-#     import underworld.visualisation as vis
-#     figsize = (800,400)
-#     camera = ['rotate x 30']
-#     Fig = vis.Figure(resolution=figsize,rulers=False,margin = 80,axis=False)
-#     Fig.Points(Model.swarm, Model.materialField,fn_size=2.0,discrete=True,colourBar=True) #colours='blue orange')
-#     #Fig.Mesh(Model.mesh)
-#     lv = Fig.window() 
-#     lv.rotate('z',45)
-#     lv.rotate('x',-60)
-#     lv.redisplay()
-
 air.density =  1. * u.kilogram / u.metre**3 
-# uppercrust.density =  2800. * u.kilogram / u.metre**3 
-# lowercrust.density =  2800. * u.kilogram / u.metre**3 
-# sediment.density =  2800. * u.kilogram / u.metre**3 
-# air.thermalExpansivity = 0.0
-# uppercrust.thermalExpansivity = 2.5e-5 / u.kelvin
-# lowercrust.thermalExpansivity = 2.5e-5 / u.kelvin
-# sediment.thermalExpansivity = 2.5e-5 / u.kelvin 
-
 uppercrust.density = GEO.LinearDensity(2800. * u.kilogram / u.metre**3,thermalExpansivity= 2.5e-5 * u.kelvin**-1,reference_temperature= 273.15*u.kelvin)
 lowercrust.density = GEO.LinearDensity(2800. * u.kilogram / u.metre**3,thermalExpansivity= 2.5e-5 * u.kelvin**-1,reference_temperature= 273.15*u.kelvin)
 sediment.density = GEO.LinearDensity(2800. * u.kilogram / u.metre**3,thermalExpansivity= 2.5e-5 * u.kelvin**-1,reference_temperature= 273.15*u.kelvin)
@@ -148,10 +111,6 @@ air.capacity = 100. * u.joule / (u.kelvin * u.kilogram)
 uppercrust.capacity  = 803.57 * u.joule / (u.kelvin * u.kilogram) 
 lowercrust.capacity  = 803.57 * u.joule / (u.kelvin * u.kilogram) 
 sediment.capacity    = 803.57 * u.joule / (u.kelvin * u.kilogram)  
-
-# uppercrust.capacity = k/uppercrust.diffusivity/uppercrust.density
-# lowercrust.capacity = k/lowercrust.diffusivity/lowercrust.density
-# sediment.capacity = k/sediment.diffusivity/sediment.density     
 
 air.radiogenicHeatProd = 0.0
 uppercrust.radiogenicHeatProd = 0.9 * u.microwatt / u.meter**3
@@ -178,7 +137,6 @@ sediment.viscosity   = viscosity
 # Huismans, R. S. and C. Beaumont (2007), Roles of lithospheric strain softening and heterogeneity in determining the geometry of rifts and continental margins, in G. D. Karner, G. Manatschal, and L. M. Pinheiro, Imaging, Mapping and Modelling Continental Lithosphere Exten- sion and Breakup, Geol. Soc. Spec. Publ., 282, 111–138, doi:10.1144/SP282.6.
 # pl = GEO.PlasticityRegistry()
 # pl.Huismans_et_al_2011_Crust
-
 frictionCoefficient1,frictionCoefficient2 = math.tan(np.deg2rad(15)),math.tan(np.deg2rad(2))
 #frictionCoefficient1,frictionCoefficient2 = 0.017,0.123
 plasticity = GEO.DruckerPrager(name="Huismans2007",cohesion=20.0 * u.megapascal,
@@ -203,7 +161,6 @@ Model.set_velocityBCs(left=[half_rate, None],
 
 Model.init_model(temperature='steady-state',pressure='lithostatic')
 
-
 Model.plasticStrain.data[...] = 0.
 xx = Model.swarm.particleCoordinates.data[:,0]
 yy = Model.swarm.particleCoordinates.data[:,-1]
@@ -225,21 +182,13 @@ fn_minmax.evaluate(Model.swarm)
 Model.plasticStrain.data[...] = Model.plasticStrain.data[...]/ fn_minmax.max_global() * 1.75
 Model.plasticStrain.data[...] *= np.random.rand(*Model.plasticStrain.data.shape[:])
 
-# import underworld.visualisation as vis
-# Fig = vis.Figure(figsize=(1200,400))
-# Fig.Surface(Model.mesh, Model.projPlasticStrain,colourBar=False)
-# Fig.show()
-
 Model.solver.set_inner_method("mumps")
 Model.solver.set_penalty(1.0e6)
 # GEO.rcParams["CFL"] = 0.2/2
 
-#Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=1. * u.kilometre, checkpoint_interval=0.1 * u.megayears,aspectRatio2d=0.25)
+Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=1. * u.kilometre, checkpoint_interval=0.1 * u.megayears,aspectRatio2d=0.25)
 
-#Model.run_for(0.10 * u.megayear, checkpoint_interval=0.05 * u.megayear,dt=2.5*u.kiloyear) #,dt=dt)
 Model.run_for(5.01 * u.megayear, checkpoint_interval=0.5 * u.megayear,dt=2.5*u.kiloyear)
-
-
 
 
 

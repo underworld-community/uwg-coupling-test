@@ -5,6 +5,8 @@ import numpy as np
 import os
 
 from underworld import UWGeodynamics as GEO
+from surfaceProcesses_old import *
+
 u = GEO.UnitRegistry
 ndim = GEO.non_dimensionalise
 dimen = GEO.dimensionalise
@@ -91,8 +93,6 @@ coords[:,0] = np.linspace(xmin,xmax,npoints)
 coords[:,1] = surfe_npfn(coords[:,0],x1,x2,h1,h2,wavel,amplitude)
 Model.add_passive_tracers('surf',vertices=coords)
 
-# Model.maxViscosity = 1e22 * u.pascal * u.second
-# Model.minViscosity = 1e18 * u.pascal * u.second
 materialA.viscosity = 1e18 * u.pascal * u.second
 materialM.viscosity = 1e21 * u.pascal * u.second
 sediment.viscosity = 1e23 * u.pascal * u.second
@@ -110,7 +110,7 @@ max_time = 80000*u.year
 checkpoint_interval = 500*u.year
 
 if use_coupling:
-    Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[materialA.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set ,aspectRatio2d=0.25,surfElevation=surf_fn)
+    Model.surfaceProcesses = Badlands(airIndex=[materialA.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set ,aspectRatio2d=0.25,surfElevation=surf_fn)
 
 Model.solver.set_inner_method("mumps")
 

@@ -37,7 +37,8 @@ dx = ndim(1.0 * u.kilometer)
 xRes,yRes = int(np.around((xmax-xmin)/dx)),int(np.around((ymax-ymin)/dy))
 yResa,yResb =int(np.around((ymax-yint)/dy)),int(np.around((yint-ymin)/dy))
 
-use_coupling = False
+
+use_coupling = True
 
 if use_coupling :
     op_case_name = 'cm_'
@@ -74,6 +75,7 @@ amplitude = h1
 
 yy = surfe_npfn(xx,x1,x2,h1,h2,wavel,amplitude)
 surf_fn = surfe_uwfn(x1,x2,h1,h2,wavel,amplitude)
+surf_fn = surfe_uwfn(x1,x2,h1,h2,wavel,amplitude)
 
 
 materialAShape = Model.y > surf_fn
@@ -83,35 +85,12 @@ materialA = Model.add_material(name="Air", shape=materialAShape)
 materialM = Model.add_material(name="Mantle", shape=materialMShape)
 sediment = Model.add_material(name="sediment")
 
-# npoints = xRes*2+1
-# coords = np.zeros((npoints,2))
-# coords[:,0] = np.linspace(xmin,xmax,npoints)
-# coords[:,1] = surfe_npfn(coords[:,0],x1,x2,h1,h2,wavel,amplitude)
+npoints = xRes*2+1
+coords = np.zeros((npoints,2))
+coords[:,0] = np.linspace(xmin,xmax,npoints)
+coords[:,1] = surfe_npfn(coords[:,0],x1,x2,h1,h2,wavel,amplitude)
+Model.add_passive_tracers('surf',vertices=coords)
 
-npoints = int(np.around((h1-h2)/dy*2+1))
-y = np.linspace(h2,h1,npoints)
-x = np.ones_like(y)*0.
-line1v = np.ascontiguousarray(np.array([x,y]).T)
-
-
-npoints = int(np.around((x1-xmin)/dx*2+1))
-x = np.linspace(xmin,x1,npoints)
-y = np.ones_like(x)*h1
-line1h = np.ascontiguousarray(np.array([x,y]).T)
-
-
-npoints = int(np.around((xmax-x2)/dx*2+1))
-x = np.linspace(x2,xmax,npoints)
-y = np.ones_like(x)*h2
-line2h = np.ascontiguousarray(np.array([x,y]).T)
-
-
-interface_coords = np.concatenate((line1h,line1v,line2h),axis=0)
-
-Model.add_passive_tracers('surf',vertices=interface_coords)
-
-# Model.maxViscosity = 1e22 * u.pascal * u.second
-# Model.minViscosity = 1e18 * u.pascal * u.second
 materialA.viscosity = 1e18 * u.pascal * u.second
 materialM.viscosity = 1e21 * u.pascal * u.second
 sediment.viscosity = 1e23 * u.pascal * u.second
@@ -129,7 +108,7 @@ max_time = 80000*u.year
 checkpoint_interval = 500*u.year
 
 if use_coupling:
-    Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[materialA.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=1.0 * u.kilometre, checkpoint_interval=checkpoint_interval,aspectRatio2d=0.25,surfElevation=surf_fn)
+    Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[materialA.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set ,aspectRatio2d=0.25,surfElevation=surf_fn)
 
 Model.solver.set_inner_method("mumps")
 

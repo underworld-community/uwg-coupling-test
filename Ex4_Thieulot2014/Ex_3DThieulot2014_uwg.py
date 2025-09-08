@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
 
 import underworld as uw
 import math
@@ -19,7 +15,6 @@ comm = uw.mpi.comm
 rank = uw.mpi.rank
 size = uw.mpi.size
 
-# solver parameters
 GEO.rcParams["initial.nonlinear.tolerance"] = 1e-2
 GEO.rcParams['initial.nonlinear.max.iterations'] = 100
 GEO.rcParams["nonlinear.tolerance"] = 1e-2
@@ -30,8 +25,6 @@ GEO.rcParams["surface.pressure.normalization"] = True
 GEO.rcParams["pressure.smoothing"] = True
 GEO.rcParams["popcontrol.split.threshold"] = 0.10
 
-
-# scaling 3: vel
 half_rate = (0.5 * u.centimeter / u.year).to(u.meter / u.second)
 model_length = 192e3 * u.meter
 model_width = 64e3 * u.meter
@@ -79,37 +72,8 @@ air        = Model.add_material(name="Air", shape=GEO.shapes.Layer3D(top=Model.t
 uppercrust = Model.add_material(name="UppperCrust", shape=GEO.shapes.Layer3D(top=0.0 * u.kilometer, bottom=-14.0 * u.kilometer))
 lowercrust = Model.add_material(name="LowerCrust", shape=GEO.shapes.Layer3D(top=-14.0 * u.kilometer, bottom=-28.0 * u.kilometer))
 sediment   = Model.add_material(name="Sediment")
-# npoints = 101
-# coords = np.ndarray((npoints, 2))
-# coords[:, 0] = np.linspace(GEO.nd(Model.minCoord[0]), GEO.nd(Model.maxCoord[0]), npoints)
-# coords[:, 1] = GEO.nd(uppercrust.top)
-# surf_tracers = Model.add_passive_tracers(name="Surface", vertices=coords)
-
-# In[12]
-
-# if size == 1:
-#     import underworld.visualisation as vis
-#     figsize = (800,400)
-#     camera = ['rotate x 30']
-#     Fig = vis.Figure(resolution=figsize,rulers=False,margin = 80,axis=False)
-#     Fig.Points(Model.swarm, Model.materialField,fn_size=2.0,discrete=True,colourBar=True) #colours='blue orange')
-#     #Fig.Mesh(Model.mesh)
-#     lv = Fig.window() 
-#     lv.rotate('z',45)
-#     lv.rotate('x',-60)
-#     lv.redisplay()
-# In[13]:
-
 
 air.density =  1. * u.kilogram / u.metre**3 
-# uppercrust.density =  2800. * u.kilogram / u.metre**3 
-# lowercrust.density =  2800. * u.kilogram / u.metre**3 
-# sediment.density =  2800. * u.kilogram / u.metre**3 
-# air.thermalExpansivity = 0.0
-# uppercrust.thermalExpansivity = 2.5e-5 / u.kelvin
-# lowercrust.thermalExpansivity = 2.5e-5 / u.kelvin
-# sediment.thermalExpansivity = 2.5e-5 / u.kelvin 
-
 uppercrust.density = GEO.LinearDensity(2800. * u.kilogram / u.metre**3,thermalExpansivity= 2.5e-5 * u.kelvin**-1,reference_temperature= 273.15*u.kelvin)
 lowercrust.density = GEO.LinearDensity(2800. * u.kilogram / u.metre**3,thermalExpansivity= 2.5e-5 * u.kelvin**-1,reference_temperature= 273.15*u.kelvin)
 sediment.density = 2300. * u.kilogram / u.metre**3
@@ -125,10 +89,6 @@ air.capacity = 100. * u.joule / (u.kelvin * u.kilogram)
 uppercrust.capacity  = 803.57 * u.joule / (u.kelvin * u.kilogram) 
 lowercrust.capacity  = 803.57 * u.joule / (u.kelvin * u.kilogram) 
 sediment.capacity    = 803.57 * u.joule / (u.kelvin * u.kilogram)  
-
-# uppercrust.capacity = k/uppercrust.diffusivity/uppercrust.density
-# lowercrust.capacity = k/lowercrust.diffusivity/lowercrust.density
-# sediment.capacity = k/sediment.diffusivity/sediment.density     
 
 air.radiogenicHeatProd = 0.0
 uppercrust.radiogenicHeatProd = 0.9 * u.microwatt / u.meter**3
@@ -151,12 +111,10 @@ uppercrust.viscosity = viscosity
 lowercrust.viscosity = viscosity
 sediment.viscosity   = viscosity
 
-
 # Plastic rheology
 # Huismans, R. S. and C. Beaumont (2007), Roles of lithospheric strain softening and heterogeneity in determining the geometry of rifts and continental margins, in G. D. Karner, G. Manatschal, and L. M. Pinheiro, Imaging, Mapping and Modelling Continental Lithosphere Exten- sion and Breakup, Geol. Soc. Spec. Publ., 282, 111–138, doi:10.1144/SP282.6.
 # pl = GEO.PlasticityRegistry()
 # pl.Huismans_et_al_2011_Crust
-
 frictionCoefficient1,frictionCoefficient2 = math.tan(np.deg2rad(15)),math.tan(np.deg2rad(2))
 #frictionCoefficient1,frictionCoefficient2 = 0.017,0.123
 plasticity = GEO.DruckerPrager(name="Huismans2007",cohesion=20.0 * u.megapascal,
@@ -182,26 +140,17 @@ Model.set_velocityBCs(left=[half_rate, None, None],
 
 Model.init_model(temperature='steady-state',pressure='lithostatic')
 
-# Model.plasticStrain.data[...] = 0.
-# xx = Model.swarm.particleCoordinates.data[:,0]
-# yy = Model.swarm.particleCoordinates.data[:,-1]
-# Lx = xmax-xmin
-# Lz = 0.-zmin
-# z1_index = np.where(Model.swarm.particleCoordinates.data[:,-1]>0.)
-# z2_index = np.where(Model.swarm.particleCoordinates.data[:,-1]<=0.)
-# xx = Model.swarm.particleCoordinates.data[z2_index,0]
-# zz = Model.swarm.particleCoordinates.data[z2_index,-1]
-# z1 = 0.
-# z2 = (1 - np.cos(2.0 * np.pi * xx / Lx))**4 * (1-np.cos(2.0*np.pi * zz / Lz)) 
-# Model.plasticStrain.data[z1_index,0] = z1
-# Model.plasticStrain.data[z2_index,0] = z2
-
-
-# fn_minmax = fn.view.min_max(Model.plasticStrain)
-# fn_minmax.evaluate(Model.swarm)
-
-# Model.plasticStrain.data[...] = Model.plasticStrain.data[...]/ fn_minmax.max_global() * 1.75
-# Model.plasticStrain.data[...] *= np.random.rand(*Model.plasticStrain.data.shape[:])
+# if size == 1:
+#     import underworld.visualisation as vis
+#     figsize = (800,400)
+#     camera = ['rotate x 30']
+#     Fig = vis.Figure(resolution=figsize,rulers=False,margin = 80,axis=False)
+#     Fig.Points(Model.swarm, Model.materialField,fn_size=2.0,discrete=True,colourBar=True) #colours='blue orange')
+#     #Fig.Mesh(Model.mesh)
+#     lv = Fig.window() 
+#     lv.rotate('z',45)
+#     lv.rotate('x',-60)
+#     lv.redisplay()
 
 Model.plasticStrain.data[:,0] = 0.
 Model.plasticStrain.data[:,0] = np.random.rand(Model.plasticStrain.data.size)
@@ -210,25 +159,13 @@ Model.plasticStrain.data[:,0] *= (1.0 - np.cos(2.0*np.pi*Model.swarm.particleCoo
 Model.plasticStrain.data[:,0] /= 10 # It looks like there is a factor 10 missing in the paper
 Model.plasticStrain.data[Model.swarm.particleCoordinates.data[:,2] > GEO.nd(0.)] = 0.
 
-
-# import underworld.visualisation as vis
-# Fig = vis.Figure(figsize=(1200,400))
-# Fig.Surface(Model.mesh, Model.projPlasticStrain,colourBar=False)
-# Fig.show()
-
 Model.solver.set_inner_method("mumps")
 Model.solver.set_penalty(1.0e6)
 # GEO.rcParams["CFL"] = 0.2/2
 
 Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=2. * u.kilometre, checkpoint_interval=10*u.kiloyear,aspectRatio2d=0.25)
 
-#Model.checkpoint(0) 
-
-#Model.run_for(0.10 * u.megayear, checkpoint_interval=0.05 * u.megayear,dt=2500*u.kiloyear) #,dt=dt)
 Model.run_for(5.01 * u.megayear, checkpoint_interval=0.1 * u.megayear,dt=10*u.kiloyear)
-
-
-# In[ ]:
 
 
 

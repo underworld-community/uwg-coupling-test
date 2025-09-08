@@ -86,7 +86,6 @@ w_m  = ndim(5 * u.kilometer)
 tau0 = 2 * k * mu0 / drho / g
 tau  = (D * k + np.sinh(D * k) * np.cosh(D * k)) / (np.sinh(D * k) ** 2) * tau0
 
-
 def perturbation(x):
     return w_m * np.cos(2.0 * np.pi * (x) / Lambda)
 
@@ -95,17 +94,7 @@ fn_coord = fn.input()
 deform_fn = w_m * fn.math.cos(2.0 * math.pi * fn_coord[0] / Lambda)
 surfElevation_fn = deform_fn
 
-# def get_analytical(x0,load_time):
-#     #tau = (D*k+np.sinh(D*k)*np.cosh(D*k))/(np.sinh(D*k)**2)*tau0
-#     #A = -F0/k/tau0
-#     #B = -F0/k/tau
-#     #C = F0/tau
-#     #E = F0/tau/np.tanh(D*k)
-#     #phi = np.sin(k*x)*np.exp(-tmax/tau)*(A*np.sinh(k*z)+B*np.cosh(k*z)+C*z*np.sinh(k*z)+E*z*np.cosh(k*z))
-#     w = w_m*np.exp(-load_time/tau)
-#     return w
-
-materialAShape = fn_coord[1] > deform_fn  # GEO.shapes.Layer(top=Model.top, bottom=Model.bottom)
+materialAShape = fn_coord[1] > deform_fn  
 materialMShape = fn_coord[1] <= deform_fn
 
 materialA = Model.add_material(name="Air", shape=materialAShape)
@@ -133,13 +122,6 @@ Model.set_velocityBCs(left=[0.0, None], right=[0, None], bottom=[0.0, 0.0], top=
 
 Model.init_model()
 
-# max_time = dimen(tau*4,u.kiloyear)
-# dt_set = dimen(tau/tRatio,u.kiloyear)
-# max_time = 101*u.kiloyear
-# dt_set = 5e-6  # 250 year
-# checkpoint_interval = dt_set*save_every
-
-
 dt_set = 1.2 * u.kiloyear
 max_time = dimen(tau * 4, u.kiloyear) + dt_set
 checkpoint_interval = dt_set * save_every
@@ -151,8 +133,7 @@ Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(
     resolution=2.0 * u.kilometre,
     checkpoint_interval=0.3 * u.kiloyear,
     aspectRatio2d=0.25,
-    surfElevation=surfElevation_fn,
-)
+    surfElevation=surfElevation_fn,)
 
 Model.solver.set_inner_method("mumps")
 Model.solver.set_penalty(1e3)

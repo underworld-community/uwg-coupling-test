@@ -8,6 +8,7 @@ import os
 from underworld import UWGeodynamics as GEO
 import numpy as np
 from underworld import visualisation as vis
+from surfaceProcesses_old import *
 
 GEO.rcParams["initial.nonlinear.tolerance"] = 1e-3
 GEO.rcParams['initial.nonlinear.max.iterations'] = 100
@@ -51,7 +52,7 @@ Model = GEO.Model(elementRes=(xRes, yRes),
                   maxCoord=(xmax, ymax),
                   gravity=(0.0, -9.81 * u.meter / u.second**2))
 
-outputPath = "op_Wedge_FreeSurfEulerian_yres{:n}_uwg_cm".format(yRes)
+outputPath = "op_Wedge_FreeSurfEulerian_yres{:n}_uwg_cm_old".format(yRes)
 Model.outputDir = outputPath
 
 air_shape = GEO.shapes.Layer(top=Model.top, bottom=0.)
@@ -149,6 +150,6 @@ dt_set =  5.0*u.kiloyear
 max_time = 1e3*u.kiloyear
 checkpoint_interval = 1e2*u.kiloyear
 
-Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set,aspectRatio2d=0.25,surfElevation=0.)
+Model.surfaceProcesses = Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set,aspectRatio2d=0.25,surfElevation=0.)
 
 Model.run_for(max_time, checkpoint_interval=checkpoint_interval,dt=dt_set)
