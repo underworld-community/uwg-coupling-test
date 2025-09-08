@@ -187,6 +187,7 @@ Model.solver.set_penalty(1.0e6)
 # GEO.rcParams["CFL"] = 0.2/2
 
 Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=1. * u.kilometre, checkpoint_interval=0.1 * u.megayears,aspectRatio2d=0.25)
+Model.surfaceProcesses.badlands_model.write=0
 
 Model.run_for(5.01 * u.megayear, checkpoint_interval=0.5 * u.megayear,dt=2.5*u.kiloyear)
 

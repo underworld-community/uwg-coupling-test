@@ -47,7 +47,7 @@ if use_coupling :
 else:
     op_case_name = 'tm_'
 
-outputPath = "op_cascade_" + op_case_name + "yres{:n}_uwg_Eulerain".format(yRes)
+outputPath = "op_Lmodel_" + op_case_name + "yres{:n}_uwg_old".format(yRes)
 
 Model = GEO.Model(elementRes=(xRes, yRes),
                   minCoord=(xmin,ymin),
@@ -109,8 +109,10 @@ dt_set =  500*u.year
 max_time = 80000*u.year
 checkpoint_interval = 500*u.year
 
+
 if use_coupling:
     Model.surfaceProcesses = Badlands(airIndex=[materialA.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set ,aspectRatio2d=0.25,surfElevation=surf_fn)
+    Model.surfaceProcesses.badlands_model.write=0
 
 Model.solver.set_inner_method("mumps")
 

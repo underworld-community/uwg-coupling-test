@@ -150,5 +150,6 @@ max_time = 1e3*u.kiloyear
 checkpoint_interval = 1e2*u.kiloyear
 
 Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(airIndex=[air.index],sedimentIndex=sediment.index,XML="badlands.xml", resolution=0.5 * u.kilometre, checkpoint_interval=dt_set,aspectRatio2d=0.25,surfElevation=0.)
+Model.surfaceProcesses.badlands_model.write=0
 
 Model.run_for(max_time, checkpoint_interval=checkpoint_interval,dt=dt_set)

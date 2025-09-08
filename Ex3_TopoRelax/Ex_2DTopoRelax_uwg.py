@@ -134,6 +134,7 @@ Model.surfaceProcesses = GEO.surfaceProcesses.Badlands(
     checkpoint_interval=0.3 * u.kiloyear,
     aspectRatio2d=0.25,
     surfElevation=surfElevation_fn,)
+Model.surfaceProcesses.badlands_model.write=0
 
 Model.solver.set_inner_method("mumps")
 Model.solver.set_penalty(1e3)
